@@ -36,7 +36,7 @@ This library is designed with a modular architecture featuring Hardware Abstract
 
 ## 📁 Library Structure
 
-\`\`\`
+```
 ├── ir_common.h/c          # Common definitions for all protocols
 ├── ir_decoder.h/c         # IR decoder library
 ├── ir_transmitter.h/c     # IR transmitter library
@@ -47,13 +47,13 @@ This library is designed with a modular architecture featuring Hardware Abstract
 │   ├── ir_transmitter_demo.c  # IR transmitter demo
 │   └── ir_remote_clone.c  # Remote control cloning
 └── README.md             # This documentation
-\`\`\`
+```
 
 ## 🚀 Usage
 
 ### 1. Decoder (Receive IR Signals)
 
-\`\`\`c
+```c
 #include "ir_decoder.h"
 #include "attiny13_hal.h"
 
@@ -89,11 +89,11 @@ int main(void) {
         }
     }
 }
-\`\`\`
+```
 
 ### 2. Transmitter (Send IR Signals)
 
-\`\`\`c
+```c
 #include "ir_transmitter.h"
 #include "attiny13_hal.h"
 
@@ -115,11 +115,11 @@ void send_power_command(void) {
     
     ir_transmitter_send(&transmitter, address, command);
 }
-\`\`\`
+```
 
 ### 3. Multi-protocol Support
 
-\`\`\`c
+```c
 // Auto-detect protocol
 IR_Protocol_t detected_protocol = ir_decoder_detect_protocol(&decoder);
 
@@ -132,13 +132,13 @@ switch(detected_protocol) {
         break;
     // ... other protocols
 }
-\`\`\`
+```
 
 ## ⚙️ Hardware Configuration
 
 ### ATTiny13 Pinout
 
-\`\`\`
+```
         ATTiny13
      ┌─────────────┐
 PB5  │1          8│ VCC
@@ -146,7 +146,7 @@ PB3  │2          7│ PB2 (LED2)
 PB4  │3          6│ PB1 (IR_IN)
 GND  │4          5│ PB0 (LED1)
      └─────────────┘
-\`\`\`
+```
 
 ### Connections
 
@@ -156,14 +156,14 @@ GND  │4          5│ PB0 (LED1)
 
 ### Fuse Settings
 
-\`\`\`
+```
 FUSE_L = 0x7A  // 9.6MHz internal oscillator
 FUSE_H = 0xFF  // Default settings
-\`\`\`
+```
 
 ## 🔨 Build and Flash
 
-\`\`\`bash
+```bash
 # Compile
 make all
 
@@ -175,7 +175,7 @@ make flash
 
 # Clean build files
 make clean
-\`\`\`
+```
 
 ## 📊 Technical Specifications
 
