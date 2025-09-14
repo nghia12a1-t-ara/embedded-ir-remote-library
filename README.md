@@ -197,6 +197,8 @@ make clean
 - Bit 1: 889µs space + 889µs burst
 - Bit 0: 889µs burst + 889µs space
 
+Refer IR Protocols Articles: [IR Remote Control Protocols](https://www.laptrinhdientu.com/2024/09/mot-so-chuan-hong-ngoai-ir-remote.html)
+
 ## 🎯 Application Examples
 
 ### 1. IR Remote Control for LEDs
