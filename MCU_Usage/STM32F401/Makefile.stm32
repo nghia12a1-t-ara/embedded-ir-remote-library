@@ -1,0 +1,101 @@
+# Makefile for STM32F401 IR Decoder
+# Author: Nghia Taarabt
+
+# Target
+TARGET = stm32f401_ir_demo
+
+# Toolchain
+CC = arm-none-eabi-gcc
+OBJCOPY = arm-none-eabi-objcopy
+OBJDUMP = arm-none-eabi-objdump
+SIZE = arm-none-eabi-size
+
+# MCU Configuration
+MCU = -mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=hard
+
+# Directories
+SRC_DIR = .
+EXAMPLES_DIR = examples
+BUILD_DIR = build
+
+# CMSIS and STM32F4 HAL paths (adjust as needed)
+CMSIS_DIR = CMSIS
+STM32F4_DIR = STM32F4xx
+
+# Source files
+SOURCES = \
+    $(SRC_DIR)/ir_common.c \
+    $(SRC_DIR)/ir_decoder.c \
+    $(SRC_DIR)/stm32f401_hal.c \
+    $(EXAMPLES_DIR)/stm32f401_ir_demo.c \
+    $(STM32F4_DIR)/system_stm32f4xx.c \
+    $(STM32F4_DIR)/startup_stm32f401xc.s
+
+# Include directories
+INCLUDES = \
+    -I$(SRC_DIR) \
+    -I$(CMSIS_DIR)/Include \
+    -I$(STM32F4_DIR)/Include
+
+# Defines
+DEFINES = \
+    -DSTM32F401xC \
+    -DUSE_STDPERIPH_DRIVER
+
+# Compiler flags
+CFLAGS = $(MCU) $(INCLUDES) $(DEFINES) -Wall -Wextra -O2 -g3
+CFLAGS += -ffunction-sections -fdata-sections
+CFLAGS += -std=c99
+
+# Linker flags
+LDFLAGS = $(MCU) -specs=nano.specs -specs=nosys.specs
+LDFLAGS += -Wl,--gc-sections -Wl,--print-memory-usage
+LDFLAGS += -T$(STM32F4_DIR)/stm32f401xc.ld
+
+# Object files
+OBJECTS = $(SOURCES:%.c=$(BUILD_DIR)/%.o)
+OBJECTS := $(OBJECTS:%.s=$(BUILD_DIR)/%.o)
+
+# Default target
+all: $(BUILD_DIR)/$(TARGET).elf $(BUILD_DIR)/$(TARGET).hex $(BUILD_DIR)/$(TARGET).bin
+
+# Create build directory
+$(BUILD_DIR):
+	mkdir -p $(BUILD_DIR)
+	mkdir -p $(BUILD_DIR)/$(EXAMPLES_DIR)
+	mkdir -p $(BUILD_DIR)/$(STM32F4_DIR)
+
+# Compile C files
+$(BUILD_DIR)/%.o: %.c | $(BUILD_DIR)
+	$(CC) $(CFLAGS) -c $< -o $@
+
+# Compile assembly files
+$(BUILD_DIR)/%.o: %.s | $(BUILD_DIR)
+	$(CC) $(CFLAGS) -c $< -o $@
+
+# Link
+$(BUILD_DIR)/$(TARGET).elf: $(OBJECTS)
+	$(CC) $(OBJECTS) $(LDFLAGS) -o $@
+	$(SIZE) $@
+
+# Generate hex file
+$(BUILD_DIR)/$(TARGET).hex: $(BUILD_DIR)/$(TARGET).elf
+	$(OBJCOPY) -O ihex $< $@
+
+# Generate binary file
+$(BUILD_DIR)/$(TARGET).bin: $(BUILD_DIR)/$(TARGET).elf
+	$(OBJCOPY) -O binary $< $@
+
+# Clean
+clean:
+	rm -rf $(BUILD_DIR)
+
+# Flash (using st-flash)
+flash: $(BUILD_DIR)/$(TARGET).bin
+	st-flash write $< 0x8000000
+
+# Debug info
+debug: $(BUILD_DIR)/$(TARGET).elf
+	$(OBJDUMP) -h -S $< > $(BUILD_DIR)/$(TARGET).lst
+
+.PHONY: all clean flash debug
